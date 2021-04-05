@@ -4,15 +4,24 @@
 Logging configuration of the BookOps-Watchdog app
 """
 
+import json
 import logging
 import os
 import traceback
 
-PROD_LOG_PATH = "../log/prod-log.log"
-DEV_LOG_PATH = "../log/dev-log.log"
+PROD_LOG_PATH = ".\\log\\prod-log.log"
+DEV_LOG_PATH = ".\\log\\dev-log.log"
 
-PROD_LOGGLY_TOKEN = os.environ["BWATCHDOG-LOGGLY-PROD"]
-DEV_LOGGLY_TOKEN = os.environ["BWATCHDOG-LOGGLY-DEV"]
+try:
+    PROD_LOGGLY_TOKEN = os.environ["BWATCHDOG-LOGGLY-PROD"]
+    DEV_LOGGLY_TOKEN = os.environ["BWATCHDOG-LOGGLY-DEV"]
+except KeyError:
+    tokens_fh = os.path.join(os.environ["USERPROFILE"], ".loggly\\loggly_tokens.json")
+    print(tokens_fh)
+    with open(tokens_fh, "r") as file:
+        data = json.load(file)
+        PROD_LOGGLY_TOKEN = data["prod_token"]
+        DEV_LOGGLY_TOKEN = data["dev_token"]
 
 
 PROD_LOGGING = {
@@ -31,7 +40,7 @@ PROD_LOGGING = {
             "level": "ERROR",
             "class": "loggly.handlers.HTTPSHandler",
             "formatter": "json",
-            "url": f"https://logs-01.loggly.com/inputs/"{PROD_LOGGLY_TOKEN}"/tag/python",
+            "url": f"https://logs-01.loggly.com/inputs/{PROD_LOGGLY_TOKEN}/tag/python",
         },
         "file": {
             "level": "DEBUG",
@@ -43,7 +52,11 @@ PROD_LOGGING = {
         },
     },
     "loggers": {
-        "babel": {"handlers": ["loggly", "file"], "level": "DEBUG", "propagate": True}
+        "bookops-watchdog": {
+            "handlers": ["loggly", "file"],
+            "level": "DEBUG",
+            "propagate": True,
+        }
     },
 }
 
@@ -77,11 +90,15 @@ DEV_LOGGING = {
             "level": "ERROR",
             "class": "loggly.handlers.HTTPSHandler",
             "formatter": "json",
-            "url": f"https://logs-01.loggly.com/inputs/"{DEV_LOGGLY_TOKEN}"/tag/python",
+            "url": f"https://logs-01.loggly.com/inputs/{DEV_LOGGLY_TOKEN}/tag/python",
         },
     },
     "loggers": {
-        "babel": {"handlers": ["console", "file", "loggly"], "level": "DEBUG", "propagate": True}
+        "bookops-watchdog": {
+            "handlers": ["console", "file", "loggly"],
+            "level": "DEBUG",
+            "propagate": True,
+        }
     },
 }
 
