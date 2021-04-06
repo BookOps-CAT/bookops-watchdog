@@ -17,7 +17,6 @@ try:
     DEV_LOGGLY_TOKEN = os.environ["BWATCHDOG-LOGGLY-DEV"]
 except KeyError:
     tokens_fh = os.path.join(os.environ["USERPROFILE"], ".loggly\\loggly_tokens.json")
-    print(tokens_fh)
     with open(tokens_fh, "r") as file:
         data = json.load(file)
         PROD_LOGGLY_TOKEN = data["prod_token"]
