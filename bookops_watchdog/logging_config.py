@@ -9,18 +9,17 @@ import logging
 import os
 import traceback
 
-PROD_LOG_PATH = ".\\log\\prod-log.log"
-DEV_LOG_PATH = ".\\log\\dev-log.log"
+LOG_PATH = ".\\log\\log.log"
 
 try:
-    PROD_LOGGLY_TOKEN = os.environ["BWATCHDOG-LOGGLY-PROD"]
-    DEV_LOGGLY_TOKEN = os.environ["BWATCHDOG-LOGGLY-DEV"]
+    LOGGER_TOKEN = os.environ["LOG-TOKEN"]
 except KeyError:
-    tokens_fh = os.path.join(os.environ["USERPROFILE"], ".loggly\\loggly_tokens.json")
+    tokens_fh = os.path.join(
+        os.environ["USERPROFILE"], ".loggly\\bwatch-log-token.json"
+    )
     with open(tokens_fh, "r") as file:
         data = json.load(file)
-        PROD_LOGGLY_TOKEN = data["prod_token"]
-        DEV_LOGGLY_TOKEN = data["dev_token"]
+        LOGGER_TOKEN = data["token"]
 
 
 PROD_LOGGING = {
@@ -39,12 +38,12 @@ PROD_LOGGING = {
             "level": "ERROR",
             "class": "loggly.handlers.HTTPSHandler",
             "formatter": "json",
-            "url": f"https://logs-01.loggly.com/inputs/{PROD_LOGGLY_TOKEN}/tag/python",
+            "url": f"https://logs-01.loggly.com/inputs/{LOGGER_TOKEN}/tag/python",
         },
         "file": {
             "level": "DEBUG",
             "class": "logging.handlers.RotatingFileHandler",
-            "filename": PROD_LOG_PATH,
+            "filename": LOG_PATH,
             "formatter": "brief",
             "maxBytes": 1024 * 1024,
             "backupCount": 5,
@@ -80,7 +79,7 @@ DEV_LOGGING = {
         "file": {
             "level": "DEBUG",
             "class": "logging.handlers.RotatingFileHandler",
-            "filename": DEV_LOG_PATH,
+            "filename": LOG_PATH,
             "formatter": "brief",
             "maxBytes": 1024 * 1024,
             "backupCount": 5,
@@ -89,7 +88,7 @@ DEV_LOGGING = {
             "level": "ERROR",
             "class": "loggly.handlers.HTTPSHandler",
             "formatter": "json",
-            "url": f"https://logs-01.loggly.com/inputs/{DEV_LOGGLY_TOKEN}/tag/python",
+            "url": f"https://logs-01.loggly.com/inputs/{LOGGER_TOKEN}/tag/python",
         },
     },
     "loggers": {
