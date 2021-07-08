@@ -8,97 +8,92 @@ import json
 import logging
 import os
 import traceback
+from typing import Dict, List, Tuple
 
-LOG_PATH = ".\\log\\log.log"
+from bookops_watchdog.errors import WatchdogError
 
-try:
-    LOGGER_TOKEN = os.environ["LOG-TOKEN"]
-except KeyError:
-    tokens_fh = os.path.join(
-        os.environ["USERPROFILE"], ".loggly\\bwatch-log-token.json"
-    )
-    with open(tokens_fh, "r") as file:
+LOG_PATH = ".\\log\\watchdog.log"
+
+
+def get_token_from_file(fh: str) -> str:
+    with open(fh, "r") as file:
         data = json.load(file)
-        LOGGER_TOKEN = data["token"]
+        return data["token"]
 
 
-PROD_LOGGING = {
-    "version": 1,
-    "disable_existing_loggers": False,
-    "formatters": {
-        "brief": {
-            "format": "%(name)s-%(asctime)s-%(filename)s-%(lineno)s-%(levelname)s-%(levelno)s-%(message)s"
-        },
-        "json": {
-            "format": '{"app":"%(name)s", "asciTime":"%(asctime)s", "fileName":"%(filename)s", "lineNo":"%(lineno)d", "levelName":"%(levelname)s", "message":"%(message)s"}'
-        },
-    },
-    "handlers": {
-        "loggly": {
-            "level": "ERROR",
-            "class": "loggly.handlers.HTTPSHandler",
-            "formatter": "json",
-            "url": f"https://logs-01.loggly.com/inputs/{LOGGER_TOKEN}/tag/python",
-        },
-        "file": {
-            "level": "DEBUG",
-            "class": "logging.handlers.RotatingFileHandler",
-            "filename": LOG_PATH,
-            "formatter": "brief",
-            "maxBytes": 1024 * 1024,
-            "backupCount": 5,
-        },
-    },
-    "loggers": {
-        "bookops-watchdog": {
-            "handlers": ["loggly", "file"],
-            "level": "DEBUG",
-            "propagate": True,
-        }
-    },
-}
+def get_config_data(env: str) -> Tuple[List, str]:
+    """
+    Determines handlers and loggly token based on the environment
+    """
+
+    if env == "local":
+        token_fh = os.path.join(os.environ["HOME"], ".loggly\\bwatch-log-token.json")
+        token = get_token_from_file(token_fh)
+        os.environ["LOG-TOKEN"] = token
+        handlers = ["console", "file", "loggly"]
+
+    else:
+        handlers = ["file", "loggly"]
+
+    token = os.getenv("LOG-TOKEN")
+
+    if not token:
+        raise WatchdogError(
+            "Logging configuration error: loggly token missing in environmental variables."
+        )
+
+    else:
+        return (handlers, token)
 
 
-DEV_LOGGING = {
-    "version": 1,
-    "disable_existing_loggers": False,
-    "formatters": {
-        "brief": {
-            "format": "%(name)s-%(asctime)s-%(filename)s-%(lineno)s-%(levelname)s-%(message)s"
+def watchdog_logging_config(env: str = "local") -> Dict:
+    """
+    Returns dictionary with logger configuration based on environment
+    """
+
+    handlers, token = get_config_data(env)
+
+    logging_config = {
+        "version": 1,
+        "disable_existing_loggers": False,
+        "formatters": {
+            "brief": {
+                "format": "%(name)s-%(asctime)s-%(filename)s-%(lineno)s-%(levelname)s-%(message)s"
+            },
+            "json": {
+                "format": '{"app":"%(name)s", "asciTime":"%(asctime)s", "fileName":"%(filename)s", "lineNo":"%(lineno)d", "levelName":"%(levelname)s", "message":"%(message)s"}'
+            },
         },
-        "json": {
-            "format": '{"app":"%(name)s", "asciTime":"%(asctime)s", "fileName":"%(filename)s", "lineNo":"%(lineno)d", "levelName":"%(levelname)s", "message":"%(message)s"}'
+        "handlers": {
+            "console": {
+                "level": "DEBUG",
+                "class": "logging.StreamHandler",
+                "formatter": "brief",
+            },
+            "file": {
+                "level": "INFO",
+                "class": "logging.handlers.RotatingFileHandler",
+                "filename": LOG_PATH,
+                "formatter": "brief",
+                "maxBytes": 1024 * 1024,
+                "backupCount": 5,
+            },
+            "loggly": {
+                "level": "ERROR",
+                "class": "loggly.handlers.HTTPSHandler",
+                "formatter": "json",
+                "url": f"https://logs-01.loggly.com/inputs/{token}/tag/python",
+            },
         },
-    },
-    "handlers": {
-        "console": {
-            "level": "DEBUG",
-            "class": "logging.StreamHandler",
-            "formatter": "brief",
+        "loggers": {
+            "bookops-watchdog": {
+                "handlers": handlers,
+                "level": "DEBUG",
+                "propagate": True,
+            }
         },
-        "file": {
-            "level": "DEBUG",
-            "class": "logging.handlers.RotatingFileHandler",
-            "filename": LOG_PATH,
-            "formatter": "brief",
-            "maxBytes": 1024 * 1024,
-            "backupCount": 5,
-        },
-        "loggly": {
-            "level": "ERROR",
-            "class": "loggly.handlers.HTTPSHandler",
-            "formatter": "json",
-            "url": f"https://logs-01.loggly.com/inputs/{LOGGER_TOKEN}/tag/python",
-        },
-    },
-    "loggers": {
-        "bookops-watchdog": {
-            "handlers": ["console", "file", "loggly"],
-            "level": "DEBUG",
-            "propagate": True,
-        }
-    },
-}
+    }
+    return logging_config
 
 
 class LogglyAdapter(logging.LoggerAdapter):

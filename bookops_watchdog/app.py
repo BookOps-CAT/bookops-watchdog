@@ -4,62 +4,64 @@
 Main module of the BookOps-Watchdog app.
 """
 
+import argparse
 import logging
 import logging.config
 import os
 
 import loggly.handlers
 
-from logging_config import DEV_LOGGING, PROD_LOGGING
-from worker_ftp import DEV_FTP, ftp_session
+from bookops_watchdog.logging_config import watchdog_logging_config
+from bookops_watchdog.worker_ftp import (
+    APP_FTP,
+    ftp_connect,
+    list_files_in_current_directory,
+)
 
 
-def validate_app():
-    """
-    Verifies and sets up workspace for the app.
-    """
+# def validate_app():
+#     """
+#     Verifies and sets up workspace for the app.
+#     """
 
-    #  veify log dir exists and if not create one
-    if not os.path.isdir(".\\log"):
-        os.mkdir(".\\log")
+#     #  veify log dir exists and if not create one
+#     if not os.path.isdir(".\\log"):
+#         os.mkdir(".\\log")
 
 
-def run(mode: str = "dev"):
-    """
-    Args:
-        mode:   'dev' or 'prod'
-    """
-    ftp_session(**DEV_FTP)
+# def run(mode: str = "local"):
+#     """
+#     Args:
+#         mode:   'local' (default), 'dev' or 'prod'
+#     """
+#     ftp = ftp_connect(**APP_FTP, library="NYPL")
+#     files = list_files_in_current_directory(ftp)
+
+#     if ftp is not None:
+#         ftp.quit()
+
+
+def createArgParser():
+    parser = argparse.ArgumentParser(description="bookops-watchdog help")
+    parser.add_argument(
+        "--env",
+        required=True,
+        type=str,
+        help="environment to run app, options: local | dev | prod",
+    )
+    return parser
 
 
 if __name__ == "__main__":
-    import argparse
 
-    parser = argparse.ArgumentParser(description="bookops-watchdog help")
-    group = parser.add_mutually_exclusive_group()
-    group.add_argument(
-        "--env",
-        help="enviroment to run app, format: --env [dev|prod]",
-        nargs=1,
-        type=str,
-    )
-
+    parser = createArgParser()
     args = parser.parse_args()
+    print(args.env)
 
-    # validate app
-    validate_app()
+    # # validate app
+    # validate_app()
 
-    # select logging environment
-    if args.env == "dev" or args.env is None:
-        env_log = DEV_LOGGING
-    elif args.env == "prod":
-        env_log = PROD_LOGGING
-    else:
-        raise AttributeError(
-            "Invalid logging environment provided. Use 'prod' or 'dev'."
-        )
-
-    logging.config.dictConfig(env_log)
+    logging.config.dictConfig(watchdog_logging_config)
     logger = logging.getLogger("bookops-watchdog")
 
-    run()
+    # run()
