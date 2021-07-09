@@ -8,30 +8,68 @@ from ftplib import FTP, error_reply
 import json
 import logging
 import os
+from typing import Dict
 
+from bookops_watchdog.errors import WatchdogError
 
 mlogger = logging.getLogger("bookops-watchdog")
 
-try:
-    APP_FTP = dict(
-        host=os.environ["FTP-HOST"],
-        user=os.environ["FTP-USER"],
-        passw=os.environ["FTP-PASSW"],
-        folder=os.environ["FTP-FOLDER"],
-    )
-except KeyError:
+
+def get_ftp_creds_from_file(fh: str) -> Dict:
+    """
+    Retrieves ftp credentials from a file and returns them as dictionary
+
+    Args:
+        fh:                 path to credentials
+
+    Returns:
+        creds:              credentials as dicitonary
+    """
+    mlogger.debug(f"FTP: retrieving credentails from {fh} .")
     try:
-        ftp_fh = os.path.join(os.environ["USERPROFILE"], ".ftp\\bwatch-ftp-cred.json")
-        with open(ftp_fh, "r") as file:
+        with open(fh, "r") as file:
             data = json.load(file)
-            APP_FTP = dict(
-                host=data["host"],
-                user=data["user"],
-                passw=data["passw"],
-                folder=data["folder"],
-            )
+            return data
     except FileNotFoundError:
-        APP_FTP = None
+        raise WatchdogError(
+            f"FTP: configuration error, unable to locate credentials at {fh} ."
+        )
+
+
+def put_creds_to_env_var(env: str = "local") -> None:
+    """
+    Prepares ftp credentials in environmental variables depending
+    on the mode (env)
+
+    Args:
+        env:                environment to run the app
+    """
+
+    if env == "local":
+        creds_fh = os.path.join(os.environ["HOME"], ".ftp\\bwatch-ftp-cred.json")
+        creds = get_ftp_creds_from_file(creds_fh)
+
+        mlogger.debug("FTP: adding credentials to environment variables.")
+        for k, v in creds.items():
+            os.environ[k] = v
+
+
+def get_ftp_creds_from_env_var() -> Dict:
+    """
+    Retrieves ftp credentials from environmental variables
+
+    Returns:
+        creds:              credentials as dictionary
+    """
+
+    creds = dict(
+        host=os.getenv("FTP_HOST"),
+        user=os.getenv("FTP_USER"),
+        passw=os.getenv("FTP_PASSW"),
+        folder=os.getenv("FTP_DIR"),
+    )
+    mlogger.info(f"FTP: credentials successfully retrieved from environment variables.")
+    return creds
 
 
 def ftp_connect(host: str, user: str, passw: str, folder: str, library: str):
@@ -42,18 +80,21 @@ def ftp_connect(host: str, user: str, passw: str, folder: str, library: str):
         user:       ftp user
         passw:      ftp password
         folder:     ftp workspace folder
+        library:    'NYPL' or 'BPL'
     """
     ftp = FTP(host)
     conn = ftp.login(user, passw)
     try:
         if conn[:3] == "230":
-            mlogger.info(f"Successfuly connected to FTP ({host}/{user}).")
-            ftp.cwd(folder)
+            mlogger.info(f"FTP: successfuly connected to ({host}/{user}).")
+            directory = f"{folder}/{library}/"
+            ftp.cwd(directory)
+            mlogger.debug(f"FTP: current folder changed to {directory}")
             return ftp
 
         else:
-            mlogger.warning(f"Failed to connect to FTP {conn}.")
+            mlogger.warning(f"FTP: failed to connect to FTP {conn}.")
             return None
     except error_reply as exc:
-        mlogger.error(f"Failt to connect to FTP. Error: {exc}")
+        mlogger.error(f"FTP: failed to connect to FTP. Error: {exc}")
         return None
