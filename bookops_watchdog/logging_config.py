@@ -24,6 +24,12 @@ def get_token_from_file(fh: str) -> str:
 def get_config_data(env: str) -> Tuple[List, str]:
     """
     Determines handlers and loggly token based on the environment
+
+    Args:
+        env:                        enviroment to run
+
+    Returns:
+        handlers, token:     tuple of list of logging handlers and loggly token
     """
 
     if env == "local":
@@ -49,6 +55,11 @@ def get_config_data(env: str) -> Tuple[List, str]:
 def watchdog_logging_config(env: str = "local") -> Dict:
     """
     Returns dictionary with logger configuration based on environment
+
+    Args:
+        env:                        environment to run the app
+
+    Returns:                        logging configuration as dictionary
     """
 
     handlers, token = get_config_data(env)
