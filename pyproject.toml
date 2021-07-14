@@ -12,6 +12,7 @@ keywords = ["cataloging", "bibliographic records", "MARC"]
 python = "^3.8"
 SQLAlchemy = "^1.4.20"
 loggly-python-handler = "^1.0.1"
+sendgrid = "^6.7.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2"
