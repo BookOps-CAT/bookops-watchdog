@@ -5,3 +5,7 @@ log_handlers:
   - null
   - null
 sendGrid_key: null
+ftp_host: null
+ftp_user: null
+ftp_passw: null
+ftp_folder: null

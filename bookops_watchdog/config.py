@@ -71,6 +71,10 @@ def configure_app(env: str = "dev") -> Tuple:
     add_environ_variables(
         watchdog_store=datastore_fh,
         watchdog_sendGrid=conf["sendGrid_key"],
+        watchdog_ftp_host=conf["ftp_host"],
+        watchdog_ftp_user=conf["ftp_user"],
+        watchdog_ftp_passw=conf["ftp_passw"],
+        watchdog_ftp_folder=conf["ftp_folder"],
     )
     return (log_fh, log_token, handlers)
 

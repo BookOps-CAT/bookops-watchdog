@@ -1,21 +1,47 @@
 # -*- coding: utf-8 -*-
 
 import datetime
+import os
 
 import pytest
+import yaml
 
-from bookops_watchdog.worker_ftp import put_creds_to_env_var
 import bookops_watchdog
 
 
 @pytest.fixture
 def fake_yaml_data():
-    return '---\nlog_fh: "foo"\nlog_handlers:\n  - console\n  - file\nloggly_token: "spam"\nsendGrid_key: "baz"'
+    return '---\nlog_fh: "foo"\nlog_handlers:\n  - console\n  - file\nloggly_token: "spam"\nsendGrid_key: "baz"\nftp_host: "ftp.foo.com"\nftp_user: "fakeFtpUser"\nftp_passw: "fakeFtpPassw"\nftp_folder: "SPAM"'
 
 
 @pytest.fixture
-def live_local_ftp_creds():
-    put_creds_to_env_var()
+def live_dev_ftp_creds():
+    fh = os.path.join(
+        os.environ["USERPROFILE"], ".bookops-watchdog\\config_variables_dev.yaml"
+    )
+    with open(fh, "r") as f:
+        creds = yaml.safe_load(f)
+        return dict(
+            host=creds["ftp_host"],
+            user=creds["ftp_user"],
+            passw=creds["ftp_passw"],
+            folder=creds["ftp_folder"],
+        )
+
+
+@pytest.fixture
+def mock_all_env_variables(monkeypatch):
+    monkeypatch.setenv("USERPROFILE", "C:\\Users\\Foo")
+    monkeypatch.setenv("LOCALAPPDATA", "C:\\Users\\Foo\\APPDATA\\LOCAL")
+    monkeypatch.setenv("watchdog_ftp_host", "ftp.foo.com")
+    monkeypatch.setenv("watchdog_ftp_user", "fakeFtpUser")
+    monkeypatch.setenv("watchdog_ftp_passw", "fakeFtpPassw")
+    monkeypatch.setenv("watchdog_ftp_folder", "SPAM")
+    monkeypatch.setenv("watchdog_sendGrid", "baz")
+    monkeypatch.setenv(
+        "watchdog_store",
+        "C:\\Users\\Foo\\APPDATA\\TEMP\\Bookops-Watchdog\\datastore.db",
+    )
 
 
 @pytest.fixture
@@ -26,32 +52,6 @@ def mock_app_data_directory(monkeypatch):
     monkeypatch.setattr(
         "bookops_watchdog.config.validate_directory", mock_validate_directory
     )
-
-
-@pytest.fixture
-def mock_env_var_token(monkeypatch):
-    monkeypatch.setenv("LOG-TOKEN", "foo")
-
-
-@pytest.fixture
-def mock_local_ftp_creds(monkeypatch):
-    def mock_ftp_creds_file(*args, **kwargs):
-        return {
-            "FTP_HOST": "foo",
-            "FTP_USER": "bar",
-            "FTP_PASSW": "spam",
-            "FTP_DIR": "baz",
-        }
-
-    monkeypatch.setattr("json.load", mock_ftp_creds_file)
-
-
-@pytest.fixture
-def mock_local_token(monkeypatch):
-    def mock_config_file(*args, **kwargs):
-        return dict(token="foo")
-
-    monkeypatch.setattr("json.load", mock_config_file)
 
 
 @pytest.fixture
