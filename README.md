@@ -15,10 +15,10 @@ FTP utlized by the application must have following directory structure:
 \TEST\BookopsWatchdog\NYPL\Archive  
 
 #### production
-\BookopsWatchdog\BPL 
-\BookopsWatchdog\BPL\Archive 
-\BookopsWatchdog\NYPL 
-\BookopsWatchdog\NYPL\Archive 
+\BookopsWatchdog\BPL  
+\BookopsWatchdog\BPL\Archive  
+\BookopsWatchdog\NYPL  
+\BookopsWatchdog\NYPL\Archive  
 
 
 ## Sierra export specs
