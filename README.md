@@ -3,4 +3,26 @@
 # BookOps-Watchdog
  BookOps cataloging quality control bot
  
- WORK-IN-PROGRESS
+
+
+## FTP setup
+FTP utlized by the application must have following directory structure:
+
+### development
+\TEST\BookopsWatchdog\BPL
+\TEST\BookopsWatchdog\BPL\Archive
+\TEST\BookopsWatchdog\NYPL
+\TEST\BookopsWatchdog\NYPL\Archive
+
+### production
+\BookopsWatchdog\BPL
+\BookopsWatchdog\BPL\Archive
+\BookopsWatchdog\NYPL
+\BookopsWatchdog\NYPL\Archive
+
+
+## Sierra export specs
+NYPL:
+* Bibliographic Record Number
+* Bibliographic Subject
+* Bibliographic Bib Code 3
