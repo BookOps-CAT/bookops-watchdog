@@ -37,7 +37,7 @@ def add_environ_variables(**kwargs) -> None:
 
 def validate_directory(data_dir: str) -> None:
     """
-    Validates the directory structure exists and if not
+    Validates the app directory structure, if does not exist
     creates one
 
     Args:
