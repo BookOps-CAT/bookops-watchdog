@@ -7,6 +7,7 @@ import pytest
 import yaml
 
 import bookops_watchdog
+from bookops_watchdog.worker_reports import SierraExportReader
 
 
 @pytest.fixture
@@ -69,3 +70,9 @@ def mock_nlst(monkeypatch):
 def mock_user(monkeypatch):
     monkeypatch.setenv("USERPROFILE", "C:\\Users\\Foo")
     monkeypatch.setenv("LOCALAPPDATA", "C:\\Users\\Foo\\APPDATA\\LOCAL")
+
+
+@pytest.fixture
+def ser():
+    """Sierra export reader"""
+    yield SierraExportReader("foo.txt")
