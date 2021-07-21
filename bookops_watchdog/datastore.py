@@ -10,6 +10,7 @@ from contextlib import contextmanager
 from sqlalchemy import (
     Boolean,
     Column,
+    Date,
     DateTime,
     ForeignKey,
     Integer,
@@ -25,8 +26,17 @@ Base = declarative_base()
 
 
 class DataAccessLayer:
-    def __init__(self):
-        self.conn = f"sqlite:///{os.getenv('watchdog_store')}"
+    def __init__(self, mode=None):
+        """
+        Creates connection to the datastore.
+        Args:
+            mode:           options: 'test' or None;
+                            use 'test' for in-memory db
+        """
+        if mode == "test":
+            self.conn = "sqlite://"
+        else:
+            self.conn = f"sqlite:///{os.getenv('watchdog_store')}"
         self.engine = None
         self.session = None
 
@@ -36,11 +46,9 @@ class DataAccessLayer:
         self.Session = sessionmaker(bind=self.engine)
 
 
-dal = DataAccessLayer()
-
-
 @contextmanager
-def session_scope():
+def session_scope(mode=None):
+    dal = DataAccessLayer(mode)
     dal.connect()
     session = dal.Session()
     try:
@@ -84,7 +92,7 @@ class Bib(Base):
     wid = Column(Integer, primary_key=True, autoincrement=False)
     library_wid = Column(Integer, ForeignKey("library.wid"), nullable=False)
     bibType = Column(String(1))
-    catDate = Column(DateTime)
+    catDate = Column(Date)
     title = Column(String(25), nullable=False)
     author = Column(String(25))
     callNo = Column(String(100))
@@ -120,7 +128,7 @@ class Order(Base):
     __tablename__ = "order"
     wid = Column(Integer, primary_key=True, autoincrement=False)
     bib_wid = Column(Integer, ForeignKey("bib.wid"), nullable=False)
-    orderDate = Column(DateTime)
+    orderDate = Column(Date)
     orderBranches = Column(String)
     orderShelves = Column(String)
     orderAudn = Column(String(1))
