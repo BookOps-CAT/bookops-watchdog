@@ -102,4 +102,5 @@ def mock_datastore_session():
     yield session
 
     # tearDown
+    session.rollback()
     session.close()
