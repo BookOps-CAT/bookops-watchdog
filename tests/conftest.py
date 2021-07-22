@@ -8,6 +8,7 @@ import yaml
 
 import bookops_watchdog
 from bookops_watchdog.worker_reports import SierraExportReader
+from bookops_watchdog.datastore import dal
 
 
 @pytest.fixture
@@ -76,3 +77,29 @@ def mock_user(monkeypatch):
 def ser():
     """Sierra export reader"""
     yield SierraExportReader("foo.txt")
+
+
+@pytest.fixture
+def mock_app_data_dir(tmpdir):
+    """
+    Returns py.path.local obj with app test data directory
+    """
+    return tmpdir.mkdir("Bookops-Watchog")
+
+
+@pytest.fixture
+def mock_datastore_file(mock_app_data_dir, monkeypatch):
+    store_fh = mock_app_data_dir.join("datastore.db")
+    monkeypatch.setenv("watchdog_store", str(store_fh))
+
+
+@pytest.fixture
+def mock_datastore_session():
+    # setUp
+    dal.conn = "sqlite:///:memory:"
+    dal.connect()
+    session = dal.Session()
+    yield session
+
+    # tearDown
+    session.close()

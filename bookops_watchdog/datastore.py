@@ -26,17 +26,11 @@ Base = declarative_base()
 
 
 class DataAccessLayer:
-    def __init__(self, mode=None):
+    def __init__(self):
         """
-        Creates connection to the datastore.
-        Args:
-            mode:           options: 'test' or None;
-                            use 'test' for in-memory db
+        Provides connection to the datastore.
         """
-        if mode == "test":
-            self.conn = "sqlite://"
-        else:
-            self.conn = f"sqlite:///{os.getenv('watchdog_store')}"
+        self.conn = f"sqlite:///{os.getenv('watchdog_store')}"
         self.engine = None
         self.session = None
 
@@ -46,9 +40,11 @@ class DataAccessLayer:
         self.Session = sessionmaker(bind=self.engine)
 
 
+dal = DataAccessLayer()
+
+
 @contextmanager
-def session_scope(mode=None):
-    dal = DataAccessLayer(mode)
+def session_scope(conn=None):
     dal.connect()
     session = dal.Session()
     try:
@@ -79,7 +75,7 @@ class Library(Base):
     __tablename__ = "library"
 
     wid = Column(Integer, primary_key=True)
-    code = Column(String(3))
+    code = Column(String(3), unique=True)
 
     def __repr__(self):
         return f"<Library(wid='{self.wid}', code='{self.code}')>"

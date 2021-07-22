@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 import pytest
 
 from bookops_watchdog.datastore import (
@@ -10,6 +9,7 @@ from bookops_watchdog.datastore import (
     Library,
     Order,
     Ticket,
+    session_scope,
 )
 
 
@@ -46,11 +46,15 @@ def test_conflict_tbl_repr():
     )
 
 
-def test_DataAccessLayer_conn(mock_all_env_variables):
+def test_DataAccessLayer_evn_var_conn(mock_all_env_variables):
     assert (
         DataAccessLayer().conn
         == "sqlite:///C:\\Users\\Foo\\APPDATA\\TEMP\\Bookops-Watchdog\\datastore.db"
     )
+
+
+# def test_DataAccessLayer_test_conn():
+#     assert DataAccessLayer().conn == "sqlite://"
 
 
 def test_file_tbl_repr():
@@ -79,6 +83,12 @@ def test_order_tbl_repr():
         str(order)
         == "<Order(wid='None', bib_wid='1', orderDate='2021-07-01', orderBranches='41,50,16', orderShelves='afc', orderAudn='a', copies='20', venNote='nfc')>"
     )
+
+
+def test_session_scope_returns_correct_obj():
+    print(os.getenv("watchdog_store"))
+    with session_scope() as s:
+        assert str(type(s)) == "<class 'sqlalchemy.orm.session.Session'>"
 
 
 def test_ticket_tbl_repr():
