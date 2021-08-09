@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import os
+
 import pytest
 
 from bookops_watchdog.datastore import (
@@ -17,10 +19,15 @@ def test_bib_tbl_repr():
     bib = Bib(
         library_wid=1,
         bibType="b",
+        bibItemForm=None,
+        bibWl=False,
+        bibAudn="j",
+        bibPhysicalDesc="1 volume",
         catDate="2021-07-01",
         title="Foo",
         author="Bar",
-        callNo="ABC",
+        callNoStaff="ABC",
+        callNoBot="ABD",
         callFormat="print",
         callAudn="j",
         callWl=False,
@@ -34,7 +41,7 @@ def test_bib_tbl_repr():
     )
     assert (
         str(bib)
-        == "<Bib(wid='None', libary_wid='1', bibType='b', catDate='2021-07-01', title='Foo')>, author='Bar', callNo='ABC', callFormat='print', callAudn='j', callWl='False', callType='dew', callCutter='True', callDewey='111', allowedBplDiv='16', subjects='foo-bar', subjectPerson='False', critWork='False')>"
+        == "<Bib(wid='None', libary_wid='1', bibType='b', bibItemForm='None', bibWl='False', bibAudn='j', bibPhysicalDesc='1 volume', catDate='2021-07-01', title='Foo', author='Bar', callNoStaff='ABC', callNoBot='ABD', callFormat='print', callAudn='j', callWl='False', callType='dew', callCutter='True', callDewey='111', allowedBplDiv='16', subjects='foo-bar', subjectPerson='False', critWork='False')>"
     )
 
 
@@ -86,7 +93,6 @@ def test_order_tbl_repr():
 
 
 def test_session_scope_returns_correct_obj():
-    print(os.getenv("watchdog_store"))
     with session_scope() as s:
         assert str(type(s)) == "<class 'sqlalchemy.orm.session.Session'>"
 

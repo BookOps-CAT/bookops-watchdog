@@ -88,10 +88,15 @@ class Bib(Base):
     wid = Column(Integer, primary_key=True, autoincrement=False)
     library_wid = Column(Integer, ForeignKey("library.wid"), nullable=False)
     bibType = Column(String(1))
+    bibItemForm = Column(String(1))
+    bibWl = Column(Boolean, nullable=False)
+    bibAudn = Column(String(1))
+    bibPhysicalDesc = Column(String)
     catDate = Column(Date)
     title = Column(String(25), nullable=False)
     author = Column(String(25))
-    callNo = Column(String(100))
+    callNoStaff = Column(String(100))
+    callNoBot = Column(String(100))
     callFormat = Column(String(5), nullable=False)
     callAudn = Column(String(1), nullable=False)
     callWl = Column(Boolean, nullable=False)
@@ -107,16 +112,28 @@ class Bib(Base):
 
     def __repr__(self):
         return (
-            f"<Bib(wid='{self.wid}', libary_wid='{self.library_wid}', "
-            f"bibType='{self.bibType}', catDate='{self.catDate}', "
-            f"title='{self.title}')>, "
-            f"author='{self.author}', callNo='{self.callNo}', "
+            f"<Bib(wid='{self.wid}', "
+            f"libary_wid='{self.library_wid}', "
+            f"bibType='{self.bibType}', "
+            f"bibItemForm='{self.bibItemForm}', "
+            f"bibWl='{self.bibWl}', "
+            f"bibAudn='{self.bibAudn}', "
+            f"bibPhysicalDesc='{self.bibPhysicalDesc}', "
+            f"catDate='{self.catDate}', "
+            f"title='{self.title}', "
+            f"author='{self.author}', "
+            f"callNoStaff='{self.callNoStaff}', "
+            f"callNoBot='{self.callNoBot}', "
             f"callFormat='{self.callFormat}', "
-            f"callAudn='{self.callAudn}', callWl='{self.callWl}', "
+            f"callAudn='{self.callAudn}', "
+            f"callWl='{self.callWl}', "
             f"callType='{self.callType}', "
-            f"callCutter='{self.callCutter}', callDewey='{self.callDewey}', "
-            f"allowedBplDiv='{self.allowedBplDiv}', subjects='{self.subjects}', "
-            f"subjectPerson='{self.subjectPerson}', critWork='{self.critWork}')>"
+            f"callCutter='{self.callCutter}', "
+            f"callDewey='{self.callDewey}', "
+            f"allowedBplDiv='{self.allowedBplDiv}', "
+            f"subjects='{self.subjects}', "
+            f"subjectPerson='{self.subjectPerson}', "
+            f"critWork='{self.critWork}')>"
         )
 
 
