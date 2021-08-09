@@ -3,8 +3,6 @@ import os
 import yaml
 from typing import Dict, List, Tuple
 
-from bookops_watchdog.errors import WatchdogError
-
 
 class LogglyAdapter(logging.LoggerAdapter):
     """
@@ -70,7 +68,6 @@ def configure_app(env: str = "dev") -> Tuple:
 
     add_environ_variables(
         watchdog_store=datastore_fh,
-        watchdog_sendGrid=conf["sendGrid_key"],
         watchdog_ftp_host=conf["ftp_host"],
         watchdog_ftp_user=conf["ftp_user"],
         watchdog_ftp_passw=conf["ftp_passw"],

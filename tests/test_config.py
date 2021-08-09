@@ -83,12 +83,11 @@ def test_configure_app_returns(
 
 
 @pytest.mark.parametrize(
-    "arg,exp1,exp2,exp3,exp4,exp5,exp6",
+    "arg,exp1,exp2,exp3,exp4,exp5",
     [
         (
             "dev",
             "C:\\Users\\Foo\\APPDATA\\LOCAL\\TEMP\\Bookops-Watchdog\\datastore.db",
-            "baz",
             "ftp.foo.com",
             "fakeFtpUser",
             "fakeFtpPassw",
@@ -97,7 +96,6 @@ def test_configure_app_returns(
         (
             "prod",
             "C:\\Users\\Foo\\APPDATA\\LOCAL\\Bookops-Watchdog\\datastore.db",
-            "baz",
             "ftp.foo.com",
             "fakeFtpUser",
             "fakeFtpPassw",
@@ -112,7 +110,6 @@ def test_configure_app_adding_env_variables(
     exp3,
     exp4,
     exp5,
-    exp6,
     fake_yaml_data,
     mock_user,
     mock_app_data_directory,
@@ -121,11 +118,10 @@ def test_configure_app_adding_env_variables(
     with mock.patch("builtins.open", mock_open):
         configure_app(arg)
         assert os.getenv("watchdog_store") == exp1
-        assert os.getenv("watchdog_sendGrid") == exp2
-        assert os.getenv("watchdog_ftp_host") == exp3
-        assert os.getenv("watchdog_ftp_user") == exp4
-        assert os.getenv("watchdog_ftp_passw") == exp5
-        assert os.getenv("watchdog_ftp_folder") == exp6
+        assert os.getenv("watchdog_ftp_host") == exp2
+        assert os.getenv("watchdog_ftp_user") == exp3
+        assert os.getenv("watchdog_ftp_passw") == exp4
+        assert os.getenv("watchdog_ftp_folder") == exp5
 
 
 def test_get_datastore_fh():

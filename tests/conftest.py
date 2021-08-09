@@ -13,7 +13,7 @@ from bookops_watchdog.datastore import dal
 
 @pytest.fixture
 def fake_yaml_data():
-    return '---\nlog_fh: "foo"\nlog_handlers:\n  - console\n  - file\nloggly_token: "spam"\nsendGrid_key: "baz"\nftp_host: "ftp.foo.com"\nftp_user: "fakeFtpUser"\nftp_passw: "fakeFtpPassw"\nftp_folder: "SPAM"'
+    return '---\nlog_fh: "foo"\nlog_handlers:\n  - console\n  - file\nloggly_token: "spam"\nftp_host: "ftp.foo.com"\nftp_user: "fakeFtpUser"\nftp_passw: "fakeFtpPassw"\nftp_folder: "SPAM"'
 
 
 @pytest.fixture
@@ -39,7 +39,6 @@ def mock_all_env_variables(monkeypatch):
     monkeypatch.setenv("watchdog_ftp_user", "fakeFtpUser")
     monkeypatch.setenv("watchdog_ftp_passw", "fakeFtpPassw")
     monkeypatch.setenv("watchdog_ftp_folder", "SPAM")
-    monkeypatch.setenv("watchdog_sendGrid", "baz")
     monkeypatch.setenv(
         "watchdog_store",
         "C:\\Users\\Foo\\APPDATA\\TEMP\\Bookops-Watchdog\\datastore.db",
