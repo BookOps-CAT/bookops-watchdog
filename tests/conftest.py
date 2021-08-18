@@ -1,44 +1,21 @@
 # -*- coding: utf-8 -*-
 
-import datetime
-import os
-
 import pytest
-import yaml
 
-import bookops_watchdog
-from bookops_watchdog.worker_reports import SierraExportReader
+
+# from bookops_watchdog.worker_reports import SierraExportReader
 from bookops_watchdog.datastore import dal
 
 
 @pytest.fixture
 def fake_yaml_data():
-    return '---\nlog_fh: "foo"\nlog_handlers:\n  - console\n  - file\nloggly_token: "spam"\nftp_host: "ftp.foo.com"\nftp_user: "fakeFtpUser"\nftp_passw: "fakeFtpPassw"\nftp_folder: "SPAM"'
-
-
-@pytest.fixture
-def live_dev_ftp_creds():
-    fh = os.path.join(
-        os.environ["USERPROFILE"], ".bookops-watchdog\\config_variables_dev.yaml"
-    )
-    with open(fh, "r") as f:
-        creds = yaml.safe_load(f)
-        return dict(
-            host=creds["ftp_host"],
-            user=creds["ftp_user"],
-            passw=creds["ftp_passw"],
-            folder=creds["ftp_folder"],
-        )
+    return '---\nlog_fh: "foo"\nlog_handlers:\n  - console\n  - file\nloggly_token: "spam"\ndrive: "S:/BookopsWatchdog"'
 
 
 @pytest.fixture
 def mock_all_env_variables(monkeypatch):
     monkeypatch.setenv("USERPROFILE", "C:\\Users\\Foo")
     monkeypatch.setenv("LOCALAPPDATA", "C:\\Users\\Foo\\APPDATA\\LOCAL")
-    monkeypatch.setenv("watchdog_ftp_host", "ftp.foo.com")
-    monkeypatch.setenv("watchdog_ftp_user", "fakeFtpUser")
-    monkeypatch.setenv("watchdog_ftp_passw", "fakeFtpPassw")
-    monkeypatch.setenv("watchdog_ftp_folder", "SPAM")
     monkeypatch.setenv(
         "watchdog_store",
         "C:\\Users\\Foo\\APPDATA\\TEMP\\Bookops-Watchdog\\datastore.db",
@@ -56,26 +33,9 @@ def mock_app_data_directory(monkeypatch):
 
 
 @pytest.fixture
-def mock_nlst(monkeypatch):
-    def mock_files(*args, **kwargs):
-        return [
-            f"BookOpsQC.{datetime.datetime.now():%Y%m%d%H%M}",
-            f"BookOpsQC.{datetime.datetime.now() - datetime.timedelta(days=1):%Y%m%d%H%M}",
-        ]
-
-    monkeypatch.setattr(bookops_watchdog.worker_ftp, "get_files_in_dir", mock_files)
-
-
-@pytest.fixture
 def mock_user(monkeypatch):
     monkeypatch.setenv("USERPROFILE", "C:\\Users\\Foo")
     monkeypatch.setenv("LOCALAPPDATA", "C:\\Users\\Foo\\APPDATA\\LOCAL")
-
-
-@pytest.fixture
-def ser():
-    """Sierra export reader"""
-    yield SierraExportReader("foo.txt")
 
 
 @pytest.fixture

@@ -12,6 +12,7 @@ from bookops_watchdog.config import (
     get_datastore_fh,
     get_log_fh,
     watchdog_logging_config,
+    validate_directory,
 )
 
 
@@ -83,23 +84,17 @@ def test_configure_app_returns(
 
 
 @pytest.mark.parametrize(
-    "arg,exp1,exp2,exp3,exp4,exp5",
+    "arg,exp1,exp2",
     [
         (
             "dev",
             "C:\\Users\\Foo\\APPDATA\\LOCAL\\TEMP\\Bookops-Watchdog\\datastore.db",
-            "ftp.foo.com",
-            "fakeFtpUser",
-            "fakeFtpPassw",
-            "SPAM",
+            "S:/BookopsWatchdog",
         ),
         (
             "prod",
             "C:\\Users\\Foo\\APPDATA\\LOCAL\\Bookops-Watchdog\\datastore.db",
-            "ftp.foo.com",
-            "fakeFtpUser",
-            "fakeFtpPassw",
-            "SPAM",
+            "S:/BookopsWatchdog",
         ),
     ],
 )
@@ -107,9 +102,6 @@ def test_configure_app_adding_env_variables(
     arg,
     exp1,
     exp2,
-    exp3,
-    exp4,
-    exp5,
     fake_yaml_data,
     mock_user,
     mock_app_data_directory,
@@ -118,10 +110,7 @@ def test_configure_app_adding_env_variables(
     with mock.patch("builtins.open", mock_open):
         configure_app(arg)
         assert os.getenv("watchdog_store") == exp1
-        assert os.getenv("watchdog_ftp_host") == exp2
-        assert os.getenv("watchdog_ftp_user") == exp3
-        assert os.getenv("watchdog_ftp_passw") == exp4
-        assert os.getenv("watchdog_ftp_folder") == exp5
+        assert os.getenv("watchdog_drive") == exp2
 
 
 def test_get_datastore_fh():
@@ -167,3 +156,11 @@ def test_watchdog_logging_config_handlers():
     assert watchdog_logging_config(
         log_fh="foo.log", log_token="bar", handlers=["console", "file"]
     )["loggers"]["bookops-watchdog"]["handlers"] == ["console", "file"]
+
+
+def test_validate_directory(tmpdir):
+    root = tmpdir.mkdir("Bookops-Watchdog")
+    data_dir = os.path.join(root, "data")
+    assert not os.path.isdir(data_dir)
+    validate_directory(data_dir)
+    assert os.path.isdir(data_dir)
