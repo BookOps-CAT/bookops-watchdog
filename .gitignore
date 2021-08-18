@@ -128,3 +128,4 @@ dmypy.json
 venvcmd.sh
 config_*.yaml
 *temp*
+*.mrk
