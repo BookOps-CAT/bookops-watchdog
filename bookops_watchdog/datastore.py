@@ -87,14 +87,11 @@ class Bib(Base):
 
     wid = Column(Integer, primary_key=True, autoincrement=False)
     library_wid = Column(Integer, ForeignKey("library.wid"), nullable=False)
-    bibType = Column(String(1))
-    bibItemForm = Column(String(1))
-    bibWl = Column(Boolean, nullable=False)
-    bibAudn = Column(String(1))
-    bibPhysicalDesc = Column(String)
-    catDate = Column(Date)
-    title = Column(String(25), nullable=False)
+
+    allowedBplDiv = Column(Integer)
+    audn = Column(String(1))
     author = Column(String(25))
+    bibType = Column(String(1))
     callNoStaff = Column(String(100))
     callNoBot = Column(String(100))
     callFormat = Column(String(5), nullable=False)
@@ -103,10 +100,15 @@ class Bib(Base):
     callType = Column(String(5))
     callCutter = Column(Boolean, nullable=False)
     callDewey = Column(String)
-    allowedBplDiv = Column(Integer)
+    catDate = Column(Date)
+    critWork = Column(Boolean, nullable=False)
+    itemForm = Column(String(1))
+    physicalDesc = Column(String)
+    primaryLang = Column(String(3))
     subjects = Column(String)
     subjectPerson = Column(Boolean, nullable=False)
-    critWork = Column(Boolean, nullable=False)
+    title = Column(String(25), nullable=False)
+    worldLang = Column(Boolean, nullable=False)
 
     orders = relationship("Order", cascade="all, delete-orphan")
 
@@ -114,14 +116,12 @@ class Bib(Base):
         return (
             f"<Bib(wid='{self.wid}', "
             f"libary_wid='{self.library_wid}', "
-            f"bibType='{self.bibType}', "
-            f"bibItemForm='{self.bibItemForm}', "
-            f"bibWl='{self.bibWl}', "
-            f"bibAudn='{self.bibAudn}', "
-            f"bibPhysicalDesc='{self.bibPhysicalDesc}', "
-            f"catDate='{self.catDate}', "
             f"title='{self.title}', "
             f"author='{self.author}', "
+            f"catDate='{self.catDate}', "
+            f"allowedBplDiv='{self.allowedBplDiv}', "
+            f"audn='{self.audn}', "
+            f"bibType='{self.bibType}', "
             f"callNoStaff='{self.callNoStaff}', "
             f"callNoBot='{self.callNoBot}', "
             f"callFormat='{self.callFormat}', "
@@ -130,10 +130,13 @@ class Bib(Base):
             f"callType='{self.callType}', "
             f"callCutter='{self.callCutter}', "
             f"callDewey='{self.callDewey}', "
-            f"allowedBplDiv='{self.allowedBplDiv}', "
+            f"critWork='{self.critWork}', "
+            f"itemForm='{self.itemForm}', "
+            f"physicalDesc='{self.physicalDesc}', "
+            f"primaryLang='{self.primaryLang}', "
             f"subjects='{self.subjects}', "
             f"subjectPerson='{self.subjectPerson}', "
-            f"critWork='{self.critWork}')>"
+            f"worldLang='{self.worldLang}')>"
         )
 
 
@@ -141,11 +144,11 @@ class Order(Base):
     __tablename__ = "order"
     wid = Column(Integer, primary_key=True, autoincrement=False)
     bib_wid = Column(Integer, ForeignKey("bib.wid"), nullable=False)
+    copies = Column(Integer, nullable=False)
     orderDate = Column(Date)
     orderBranches = Column(String)
     orderShelves = Column(String)
     orderAudn = Column(String(1))
-    copies = Column(Integer, nullable=False)
     venNote = Column(String)
 
     def __repr__(self):
