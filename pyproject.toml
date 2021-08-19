@@ -13,6 +13,7 @@ python = "^3.8"
 SQLAlchemy = "^1.4.20"
 loggly-python-handler = "^1.0.1"
 PyYAML = "^5.4.1"
+pymarc = "^4.1.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2"

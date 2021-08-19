@@ -60,6 +60,8 @@ idna==2.10; python_version >= "2.7" and python_full_version < "3.0.0" or python_
 loggly-python-handler==1.0.1 \
     --hash=sha256:adce302d21fbc5b9647a01067243fb549e9992bfe5ab09807b8fad56c9411995 \
     --hash=sha256:0a4a826adb31ffeb76dac7ca116ccb032ed923254244160e70ddd2c3e88df4fd
+pymarc==4.1.1; python_version >= "3.6" \
+    --hash=sha256:b86261927f346521bf1b02eaf75a47d9907ae9d9bc295c1a89ff24e7817dc1ba
 pyyaml==5.4.1; (python_version >= "2.7" and python_full_version < "3.0.0") or (python_full_version >= "3.6.0") \
     --hash=sha256:3b2b1824fe7112845700f815ff6a489360226a5609b96ec2190a45e62a9fc922 \
     --hash=sha256:129def1b7c1bf22faffd67b8f3724645203b79d8f4cc81f674654d9902cb4393 \
